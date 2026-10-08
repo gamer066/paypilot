@@ -76,6 +76,17 @@ if st.button("⚡ One-click demo", type="primary", help="Fresh data, agent run, 
         st.session_state["demo_steps"] = agent.run_guided_demo()
     st.rerun()
 
+with st.expander("ℹ️ How PayPilot works (in plain words)"):
+    st.markdown("""
+1. **It reads invoices** (PDF, text, CSV) and checks them: 5% VAT, tax number, totals.
+2. **It finds late invoices** and invoices due soon, and writes a reminder (friendly first, firmer later).
+3. **A person approves.** Nothing is sent until you click Approve. The code enforces this.
+4. **It reads replies**: "will pay Friday" updates the status; "invoice is wrong" goes to a human.
+5. **It reports and logs**: a weekly cash summary, and every action in the audit log.
+
+All data here is FAKE. Emails are simulated.
+""")
+
 invoices = core.all_invoices()
 if not invoices:
     st.info("No invoices yet. Click **Reset and load 10 FAKE sample invoices** in the sidebar, "
