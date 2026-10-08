@@ -49,6 +49,15 @@ Yes, PDFs, plus text, CSV and JSON files. Scanned photos are not supported yet.
 **What is the cash forecast?**
 A simple estimate of what will be paid in the next 30 days, using how likely each kind of invoice is to be paid. It is labelled as an estimate.
 
+**Why is this not already on the market?**
+Accounting tools do have basic automatic reminders. PayPilot goes further: it checks the invoice first, picks the tone from history, reads the replies, keeps a person in charge, and logs everything. It also writes in Arabic. (Do not say nobody does this. If asked about a specific tool, say you compared the basics and would test properly in a pilot.)
+
+**What is the difference between your idea and a real business?**
+The idea is the agent. The business is selling it to small companies for a monthly fee, reaching them through accountants and small business groups, and proving it by recovering real invoices. We have not tested with real customers yet. That is the next step.
+
+**What about legal and privacy rules?**
+The demo uses fake data. For real customers we would check UAE VAT rules and data protection rules first, keep each business's data separate, and keep the human approval and the log.
+
 **What did you build in this hackathon?**
 Everything: the agent and its tools, the safety gate, invoice checks, PDF reading, Arabic, approval screen, reports, audit log, and the website.
 
