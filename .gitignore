@@ -8,3 +8,4 @@ docs_upload.zip
 _video_tmp/
 demo_backup.mp4
 _video_log.txt
+_audit_*.py

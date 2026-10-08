@@ -1,30 +1,42 @@
-# PayPilot status report (9 Oct 2026) - for the planning session
+# PayPilot - full status (9 Oct 2026)
 
-## Done
-- **Step 1-6 built, and more:** fake data (10 invoices), invoice upload + validation (5% VAT, TRN, totals), agent with tools (list_attention, check_invoice, draft_reminder, request_approval, send_email, escalate_to_human, log_action), approval queue, customer reply handling + escalation, weekly report, audit log. Python + Streamlit + SQLite + Claude tool use, with offline-rules fallback.
-- **Safety enforced in code:** send_email refuses unless a human approved that draft (tested). Invoices with errors, disputes and silent customers go to a human. One reminder per week max.
-- **Tests pass:** test_flow.py, test_ui.py (dashboard), test_claude_mock.py (Claude loop with a pretend Claude; early send was blocked).
-- **Bug found and fixed while recording:** dashboard jumped back to tab 1 after clicking Approve. Fixed and pushed.
-- **Online:**
-  - Website (animated, scroll effects, in-page demo): https://paypilotai.pages.dev
-  - Live app (Streamlit Cloud, offline mode, fake data): https://paypilot-agent.streamlit.app
-  - Code (public): https://github.com/gamer066/paypilot
-- **Pitch pack:** PayPilot_pitch.pptx (7 slides), PITCH.md (description to paste, 3-min script, Q&A, checklist).
-- **Backup demo video:** demo_backup.mp4 (about 2.5 min, voice-over + captions), recorded by script (make_demo_video.py).
+## Links (all live)
+- Website: https://paypilotai.pages.dev (backup copy: https://gamer066.github.io/paypilot/)
+- Live app: https://paypilot-agent.streamlit.app (offline mode, fake data)
+- Code (public): https://github.com/gamer066/paypilot
 
-## Not done / only Salman can do
-1. **Anthropic API key** - not obtained (console needs phone code + card). Claude mode is untested live (only with a mock). Offline mode works.
-2. **Eyeball the slides** and the website on a phone - not visually checked.
-3. **Submit** on the hackathon site with the links above (he clicks Submit).
-4. Open the live app link once before 23 Oct so it is not asleep.
+## What the app does
+- Reads invoices (PDF, txt, csv, json) and checks them: 5% VAT, TRN, totals, dates.
+- Agent finds overdue and due-soon invoices, writes reminders (heads-up, polite, firm, final), max one a week.
+- "Agent reasoning" box explains why it chose each tone or escalation.
+- Human approval queue: edit, switch Arabic/English, approve. Nothing sends before that (enforced in code, tested).
+- Customer replies (English + Arabic): promise, dispute, already paid, unclear. Updates status or alerts a human.
+- Risk score per invoice, 30-day cash forecast, weekly cash summary (download), full audit log (download).
+- One-click demo button in the sidebar. Claude mode with an API key; offline rules mode without.
+- Emails are simulated (outbox). Real email sending was considered and SKIPPED (his choice).
 
-## Decisions made
-- Landing site on Cloudflare Pages as paypilotai.pages.dev (paypilot.pages.dev is taken; Salman rejected the long name).
-- No API key in the public app (anyone could spend credit); Claude mode only on his laptop.
-- To update the website: re-upload docs_upload.zip in the Cloudflare dashboard (direct upload, not git).
+## Quality checks done
+- test_flow.py, test_features.py, test_ui.py, test_ui2.py, test_claude_mock.py all pass.
+- Live app checked after deploy: one-click demo runs.
+- Bug found by recording the demo and fixed: tab jumped back to tab 1 after Approve.
 
-## Timeline
-- 8-9 Oct: built, deployed, video.
-- By 19 Oct: freeze features, practise demo.
-- 22 Oct: final check, backup video ready.
-- 23 Oct: online round. 24 Oct: finals at AUD if in top 10.
+## Pitch material
+- PayPilot_pitch.pptx (8 slides incl. business model), PITCH.md (description, 3-min script, Q&A, checklist).
+- demo_backup.mp4 (2 min, computer voice). Salman does NOT like it (reason not given). Can be redone.
+- Business model: AED 99/month is a PROPOSED price. The "94% of UAE companies are SMEs" stat is unverified, not used.
+
+## Not done / needs Salman
+1. Anthropic API key (needs phone code + card) - Claude mode untested live; mock test only.
+2. Tell me what is wrong with the demo video, or record his own voice with record_demo.bat.
+3. Look at the slides and the website on his phone (not visually checked).
+4. Show the app to one real business owner and get a quote (optional, strong).
+5. Click Submit on the hackathon form with the links.
+6. Open the live app link once before 23 Oct so it is awake.
+
+## Dates
+- 19 Oct: stop adding features. 22 Oct: final check + video ready. 23 Oct: online round. 24 Oct: finals at AUD (top 10).
+
+## How to update things
+- App: push to GitHub, Streamlit Cloud redeploys by itself.
+- Website: rebuild docs_upload.zip, upload in Cloudflare dashboard (paypilotai > Create deployment). GitHub Pages copy updates on push.
+- Re-record video: python make_demo_video.py. Retake screenshots: python make_screenshots.py.

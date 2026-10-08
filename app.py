@@ -32,6 +32,14 @@ div[data-testid="stVerticalBlockBorderWrapper"]{border-radius:16px}
 button[kind="primary"]{background:linear-gradient(100deg,#19e6c9,#8b5cf6)!important;color:#04101e!important;border:0!important;font-weight:700}
 .stTabs [data-baseweb="tab"]{font-weight:600}
 [data-testid="stSidebar"]{background:#071022}
+@media(max-width:640px){
+  .block-container{padding:3.5rem 1rem 3rem!important}
+  h1{font-size:2.1rem!important}
+  [data-testid^="stBaseButton"]{min-height:48px}
+  div[role="radiogroup"] label{min-height:44px;display:flex;align-items:center}
+  [data-testid="stMetricValue"]{font-size:1.7rem}
+  [data-testid="stTabs"] button{min-height:44px}
+}
 </style>""", unsafe_allow_html=True)
 
 STATUS_ICON = {"Paid": "🟢 Paid", "Pending": "⚪ Pending", "Overdue": "🔴 Overdue",
@@ -50,10 +58,6 @@ with st.sidebar:
             os.environ["ANTHROPIC_API_KEY"] = key.strip()
             st.rerun()
     st.divider()
-    if st.button("⚡ One-click demo", type="primary", help="Fresh data, agent run, one approval, two customer replies"):
-        with st.spinner("Running the whole story..."):
-            st.session_state["demo_steps"] = agent.run_guided_demo()
-        st.rerun()
     if st.button("Reset and load 10 FAKE sample invoices"):
         seed.load_sample()
         st.session_state.pop("demo_steps", None)
@@ -64,6 +68,11 @@ with st.sidebar:
 st.title("💸 PayPilot")
 st.caption("An AI agent that chases unpaid invoices for small UAE businesses - "
            "with a human approving every message.")
+
+if st.button("⚡ One-click demo", type="primary", help="Fresh data, agent run, one approval, two customer replies"):
+    with st.spinner("Running the whole story..."):
+        st.session_state["demo_steps"] = agent.run_guided_demo()
+    st.rerun()
 
 invoices = core.all_invoices()
 if not invoices:

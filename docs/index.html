@@ -111,7 +111,7 @@ nav .wrap{display:flex;align-items:center;justify-content:space-between;gap:16px
 .pbar{height:6px;background:var(--line);border-radius:6px;overflow:hidden}
 .pbar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--teal),var(--violet));transition:1.2s}
 .pane.on .pbar i{width:100%}
-@media(max-width:900px){#story{height:auto;padding:80px 0}.pin{position:static;height:auto}.pin .wrap{grid-template-columns:1fr}.stage{height:auto;display:grid;gap:14px;border:0;background:none;box-shadow:none}.pane{position:static;opacity:1;transform:none;border:1px solid var(--line);border-radius:18px}.steps{display:none}}
+@media(max-width:900px){#story{height:auto;padding:80px 0}.pin{position:static;height:auto}.pin .wrap{grid-template-columns:1fr}.stage{height:auto;display:grid;grid-template-columns:minmax(0,1fr);gap:14px;border:0;background:none;box-shadow:none}.pane{position:static;opacity:1;transform:none;border:1px solid var(--line);border-radius:18px}.steps{display:none}}
 /* demo */
 .demo{border:1px solid var(--line);border-radius:26px;background:linear-gradient(160deg,rgba(255,255,255,.06),rgba(255,255,255,.015));padding:26px;margin-top:40px;box-shadow:0 40px 100px rgba(0,0,0,.45)}
 .dtop{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:20px}
@@ -174,6 +174,30 @@ pre .k{color:#ff7ac6}pre .f{color:var(--teal)}pre .s{color:#ffd479}pre .c{color:
 .cta2 h2{font-size:clamp(38px,6.4vw,78px)}
 footer{border-top:1px solid var(--line);padding:34px 0;color:var(--mut);font-size:14px}
 footer .wrap{display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap}
+.pane{box-sizing:border-box}
+.dgrid>*,.stack>*{min-width:0}
+.panel{overflow-x:auto}
+@media(max-width:600px){
+  section{padding:70px 0}
+  .btn{min-height:44px}
+  .btn.sm{padding:11px 16px;font-size:14px}
+  .logo{min-height:44px}
+  .chip{font-size:12.5px}
+  .inv small,.tag,.note,.log{font-size:12.5px}
+  th{font-size:12px}
+  td{font-size:13px}
+  pre{font-size:12px;white-space:pre-wrap;word-break:break-word}
+  .demo{padding:14px}
+  .shots figure{overflow-x:auto}
+  .shots img{width:auto;min-width:820px;max-width:none}
+  .shots figcaption{position:sticky;left:0}
+  .shots figcaption::after{content:" - swipe sideways to see the whole screen";color:var(--teal)}
+  td .chip{white-space:normal;display:inline-block;line-height:1.25;padding:3px 8px;text-align:center}
+  td,th{padding:8px 3px}
+  .draft .row{flex-wrap:wrap}
+  .draft .row .btn{flex:1 1 100%}
+  .card,.tile{padding:22px}
+}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.rv{opacity:1;transform:none}html{scroll-behavior:auto}}
 </style>
 </head>
@@ -318,7 +342,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap}
     <figure class="rv d1"><div class="bar"><i></i><i></i><i></i></div><img loading="lazy" src="img/audit.jpg" alt="Audit log"><figcaption>Audit log: every action, who, when</figcaption></figure>
   </div>
   <div style="text-align:center;margin-top:40px"><a class="btn p app-link" href="#" target="_blank" rel="noopener">Try it yourself &rarr;</a>
-  <p class="note" style="margin-top:12px">Tip: press the one-click demo button in the sidebar.</p></div>
+  <p class="note" style="margin-top:12px">Tip: press the one-click demo button at the top of the app.</p></div>
 </div></section>
 
 <section id="safety"><div class="wrap">
