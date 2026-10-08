@@ -1,0 +1,12 @@
+TAX INVOICE  (SAMPLE - FAKE DATA)
+Invoice No: INV-1008
+Supplier: Sandstone Office Supplies LLC (FAKE)
+Customer: Saffron Court Restaurant (FAKE)
+Customer Email: accounts@saffroncourt-restaurant.example
+Customer TRN: 100789012300003
+Issue Date: 2026-09-10
+Due Date: 2026-10-10
+Description: Office supplies and services
+Amount before VAT: AED 950.00
+VAT: AED 47.50
+Total: AED 997.50

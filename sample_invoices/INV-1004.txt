@@ -1,0 +1,12 @@
+TAX INVOICE  (SAMPLE - FAKE DATA)
+Invoice No: INV-1004
+Supplier: Sandstone Office Supplies LLC (FAKE)
+Customer: Palm Crest Interiors (FAKE)
+Customer Email: accounts@palmcrest-interiors.example
+Customer TRN: 100456789000003
+Issue Date: 2026-07-15
+Due Date: 2026-08-14
+Description: Office supplies and services
+Amount before VAT: AED 3,200.00
+VAT: AED 160.00
+Total: AED 3,360.00

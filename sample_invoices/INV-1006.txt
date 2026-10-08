@@ -1,0 +1,12 @@
+TAX INVOICE  (SAMPLE - FAKE DATA)
+Invoice No: INV-1006
+Supplier: Sandstone Office Supplies LLC (FAKE)
+Customer: Marina Bright Cleaning (FAKE)
+Customer Email: accounts@marinabright-cleaning.example
+Customer TRN: 100678901200003
+Issue Date: 2026-09-30
+Due Date: 2026-10-30
+Description: Office supplies and services
+Amount before VAT: AED 1,500.00
+VAT: AED 150.00
+Total: AED 1,650.00

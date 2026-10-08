@@ -1,0 +1,12 @@
+TAX INVOICE  (SAMPLE - FAKE DATA)
+Invoice No: INV-1005
+Supplier: Sandstone Office Supplies LLC (FAKE)
+Customer: Blue Dune IT Services (FAKE)
+Customer Email: accounts@bluedune-it.example
+Customer TRN: 100567890100003
+Issue Date: 2026-09-01
+Due Date: 2026-09-30
+Description: Office supplies and services
+Amount before VAT: AED 8,000.00
+VAT: AED 400.00
+Total: AED 8,400.00

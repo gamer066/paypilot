@@ -1,0 +1,12 @@
+TAX INVOICE  (SAMPLE - FAKE DATA)
+Invoice No: INV-1001
+Supplier: Sandstone Office Supplies LLC (FAKE)
+Customer: Al Noor Trading LLC (FAKE)
+Customer Email: accounts@alnoor-trading.example
+Customer TRN: 100123456700003
+Issue Date: 2026-09-20
+Due Date: 2026-10-20
+Description: Office supplies and services
+Amount before VAT: AED 4,000.00
+VAT: AED 200.00
+Total: AED 4,200.00

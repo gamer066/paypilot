@@ -1,0 +1,6 @@
+.env
+paypilot.db
+__pycache__/
+*.pyc
+demo_backup.mp4
+site/

@@ -1,0 +1,12 @@
+TAX INVOICE  (SAMPLE - FAKE DATA)
+Invoice No: INV-1002
+Supplier: Sandstone Office Supplies LLC (FAKE)
+Customer: Desert Rose Catering (FAKE)
+Customer Email: accounts@desertrose-catering.example
+Customer TRN: 100234567800003
+Issue Date: 2026-08-01
+Due Date: 2026-08-31
+Description: Office supplies and services
+Amount before VAT: AED 2,500.00
+VAT: AED 125.00
+Total: AED 2,625.00

@@ -1,0 +1,12 @@
+TAX INVOICE  (SAMPLE - FAKE DATA)
+Invoice No: INV-1007
+Supplier: Sandstone Office Supplies LLC (FAKE)
+Customer: Falcon Eye Security (FAKE)
+Customer Email: accounts@falconeye-security.example
+Customer TRN: 
+Issue Date: 2026-10-02
+Due Date: 2026-11-01
+Description: Office supplies and services
+Amount before VAT: AED 5,600.00
+VAT: AED 280.00
+Total: AED 5,880.00
