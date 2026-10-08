@@ -3,7 +3,7 @@ import json
 import os
 import re
 
-MODEL = "claude-sonnet-5-5"
+MODEL = os.environ.get("PAYPILOT_MODEL", "claude-sonnet-5-5")
 
 
 def _load_dotenv():

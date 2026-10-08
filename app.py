@@ -12,6 +12,8 @@ import seed
 import tools
 
 st.set_page_config(page_title="PayPilot", page_icon="💸", layout="wide")
+import uuid
+db.use_session(st.session_state.setdefault("sid", uuid.uuid4().hex[:12]))  # private demo per visitor
 db.init()
 try:  # on Streamlit Cloud the key lives in Secrets, not in the code
     if "ANTHROPIC_API_KEY" in st.secrets and not os.environ.get("ANTHROPIC_API_KEY"):

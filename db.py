@@ -1,6 +1,9 @@
 """PayPilot database (SQLite). One small file, no setup needed."""
+import os
 import sqlite3
-from datetime import datetime
+import threading
+import time
+from datetime import datetime, timedelta, timezone
 
 DB_FILE = "paypilot.db"
 
@@ -31,12 +34,36 @@ CREATE TABLE IF NOT EXISTS audit (
 """
 
 
+DUBAI = timezone(timedelta(hours=4))  # the cloud server runs on UTC; the business is in Dubai
+_local = threading.local()
+_last_cleanup = [0.0]
+
+
 def now():
-    return datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    return datetime.now(DUBAI).strftime("%Y-%m-%d %H:%M:%S")
+
+
+def use_session(sid):
+    """Give each visitor their own private database, so two judges never touch each other's demo."""
+    os.makedirs("sessions", exist_ok=True)
+    _local.path = os.path.join("sessions", f"{sid}.db")
+    if time.time() - _last_cleanup[0] > 3600:  # delete visitor databases older than a day
+        _last_cleanup[0] = time.time()
+        for f in os.listdir("sessions"):
+            p = os.path.join("sessions", f)
+            if f.endswith(".db") and time.time() - os.path.getmtime(p) > 86400:
+                try:
+                    os.remove(p)
+                except OSError:
+                    pass
+
+
+def path():
+    return getattr(_local, "path", DB_FILE)
 
 
 def _conn():
-    c = sqlite3.connect(DB_FILE)
+    c = sqlite3.connect(path())
     c.row_factory = sqlite3.Row
     return c
 

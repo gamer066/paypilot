@@ -2,6 +2,8 @@ from streamlit.testing.v1 import AppTest
 import db, seed
 db.init(); seed.load_sample()
 at = AppTest.from_file("app.py", default_timeout=40).run()
+import db as _db
+_db.use_session(at.session_state["sid"])
 assert not at.exception, at.exception
 next(b for b in at.button if "One-click" in b.label).click(); at.run()
 assert not at.exception, at.exception

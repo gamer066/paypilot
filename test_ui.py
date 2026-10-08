@@ -6,6 +6,8 @@ db.init(); seed.load_sample()
 print(core.extract_rules(open("sample_invoices/INV-1007.txt").read())["trn"] == "")
 
 at = AppTest.from_file("app.py", default_timeout=30).run()
+import db as _db
+_db.use_session(at.session_state["sid"])
 assert not at.exception, at.exception
 print("loaded OK; tabs:", [t.label for t in at.tabs])
 next(b for b in at.button if b.label.startswith("▶")).click()
