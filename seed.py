@@ -20,6 +20,9 @@ ROWS = [
 ]
 
 
+ARABIC = {"INV-1002"}  # this fake customer prefers Arabic reminders
+
+
 def invoice_text(inv):
     return f"""TAX INVOICE  (SAMPLE - FAKE DATA)
 Invoice No: {inv['id']}
@@ -43,7 +46,8 @@ def build():
         out.append({"id": id_, "customer": cust, "email": f"accounts@{slug}.example", "trn": trn,
                     "amount_excl_vat": net, "vat": vat, "total": round(net + vat, 2),
                     "issue_date": (t + timedelta(days=issued)).isoformat(),
-                    "due_date": (t + timedelta(days=due)).isoformat(), "paid": paid})
+                    "due_date": (t + timedelta(days=due)).isoformat(), "paid": paid,
+                    "language": "ar" if id_ in ARABIC else "en"})
     return out
 
 
@@ -52,6 +56,22 @@ def write_sample_files():
     for inv in build():
         with open(f"sample_invoices/{inv['id']}.txt", "w", encoding="utf-8") as f:
             f.write(invoice_text(inv))
+    try:  # PDF versions of a few invoices, to show real PDF reading (needs fpdf2; skipped if missing)
+        from fpdf import FPDF
+        os.makedirs("sample_invoices/pdf", exist_ok=True)
+        for inv in build():
+            if inv["id"] not in ("INV-1001", "INV-1002", "INV-1006", "INV-1007"):
+                continue
+            pdf = FPDF()
+            pdf.add_page()
+            pdf.set_font("Helvetica", "B", 16)
+            pdf.cell(0, 10, "TAX INVOICE (SAMPLE - FAKE DATA)", new_x="LMARGIN", new_y="NEXT")
+            pdf.set_font("Helvetica", "", 12)
+            for line in invoice_text(inv).splitlines()[1:]:
+                pdf.cell(0, 8, line, new_x="LMARGIN", new_y="NEXT")
+            pdf.output(f"sample_invoices/pdf/{inv['id']}.pdf")
+    except ImportError:
+        pass
 
 
 def load_sample(reset=True):

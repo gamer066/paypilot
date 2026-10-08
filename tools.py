@@ -4,6 +4,7 @@
 Humans approve through human_decide(), which the AI model cannot call."""
 import db
 import core
+import i18n
 
 TONES = ("heads-up", "polite", "firm", "final")
 
@@ -17,7 +18,11 @@ def template_reminder(inv, tone):
     """Offline wording (Claude writes its own when an API key is set)."""
     amt = f"AED {inv['total']:,.2f}"
     n, name = inv["id"], inv["customer"].replace(" (FAKE)", "")
-    sign = f"\n\nKind regards,\nAccounts Team\n{core.BUSINESS_NAME}"
+    if inv.get("language") == "ar":
+        subj, body = i18n.AR[tone]
+        vals = dict(n=n, name=name, amt=amt, due=inv["due_date"], days=inv["days_overdue"])
+        return subj.format(**vals), body.format(**vals) + i18n.BIZ_SIGN_AR.format(biz=core.BUSINESS_NAME)
+    sign =f"\n\nKind regards,\nAccounts Team\n{core.BUSINESS_NAME}"
     if tone == "heads-up":
         return (f"Friendly reminder: invoice {n} due on {inv['due_date']}",
                 f"Dear {name} team,\n\nJust a friendly heads-up that invoice {n} for {amt} is due on "
@@ -45,7 +50,8 @@ def list_attention():
     for inv in core.all_invoices():
         base = {"invoice_id": inv["id"], "customer": inv["customer"], "total_aed": inv["total"],
                 "status": inv["status"], "days_overdue": inv["days_overdue"],
-                "days_to_due": inv["days_to_due"], "reminders_sent": inv["reminders_sent"]}
+                "days_to_due": inv["days_to_due"], "reminders_sent": inv["reminders_sent"],
+                "language": inv.get("language", "en")}
         has_open = db.query("SELECT 1 FROM drafts WHERE invoice_id=? AND status IN "
                             "('draft','pending_approval','approved')", (inv["id"],))
         if inv["status"] == "Needs review":
@@ -73,7 +79,7 @@ def check_invoice(invoice_id):
     if not inv:
         return _fail(f"No invoice {invoice_id}")
     keep = ("id", "customer", "email", "trn", "amount_excl_vat", "vat", "total", "issue_date",
-            "due_date", "status", "issues", "days_overdue", "days_to_due", "reminders_sent")
+            "due_date", "status", "issues", "days_overdue", "days_to_due", "reminders_sent", "language")
     db.log("agent", "check_invoice", invoice_id, f"status={inv['status']}, issues={len(inv['issues'])}")
     return {"ok": True, **{k: inv[k] for k in keep}}
 
@@ -167,7 +173,8 @@ SCHEMAS = [
     {"name": "draft_reminder",
      "description": "Write a payment reminder email draft. tone: heads-up (due soon), polite (first overdue), "
                     "firm (second), final (third). Write subject and body yourself in clear, courteous, "
-                    "professional English, mention invoice number, AED amount, due date. Sign as the Accounts Team.",
+                    "professional language, mention invoice number, AED amount, due date. Write in the invoice's "
+                    "'language' field: 'en' = English, 'ar' = Modern Standard Arabic. Sign as the Accounts Team.",
      "input_schema": {"type": "object", "properties": {
          "invoice_id": {"type": "string"}, "tone": {"type": "string", "enum": list(TONES)},
          "subject": {"type": "string"}, "body": {"type": "string"}},

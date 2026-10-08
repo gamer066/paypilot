@@ -5,6 +5,7 @@ from datetime import timedelta
 
 import core
 import db
+import i18n
 import llm
 import tools
 
@@ -82,6 +83,23 @@ def _run_claude(max_steps):
     return lines
 
 
+def run_guided_demo():
+    """One click: fresh fake data -> agent run -> manager approves one -> two customer replies.
+    Leaves 2 reminders in the approval queue so the judge can approve them live."""
+    import seed
+    seed.load_sample()
+    steps = ["Loaded 10 FAKE invoices"]
+    _, lines = run_agent()
+    steps += ["Agent: " + ln for ln in lines]
+    first = db.query("SELECT id, invoice_id FROM drafts WHERE status='pending_approval' ORDER BY id")
+    if first:
+        tools.human_decide(first[0]["id"], True, "Manager (demo)")
+        steps.append(f"Manager approved the reminder for {first[0]['invoice_id']} -> sent to the outbox")
+    steps.append("Customer (INV-1004): " + handle_reply("INV-1004", "Sorry for the delay, we will pay on Friday."))
+    steps.append("Customer (INV-1002, Arabic): " + handle_reply("INV-1002", "هذه الفاتورة غير صحيحة"))
+    return steps
+
+
 # ---------------------------------------------------------------- replies
 DISPUTE = ("wrong", "incorrect", "mistake", "error", "not ours", "dispute", "did not order",
            "didn't order", "overcharg", "not correct", "never received", "not received", "too much")
@@ -116,6 +134,19 @@ def _promise_date(t):
 
 def classify_rules(text):
     t = text.lower()
+    if any(k in text for k in i18n.AR_DISPUTE):
+        return {"intent": "dispute", "promised_date": None, "summary": "Customer says the invoice is wrong (Arabic)."}
+    if any(k in text for k in i18n.AR_PAID):
+        return {"intent": "paid_claim", "promised_date": None, "summary": "Customer says they already paid (Arabic)."}
+    if any(k in text for k in i18n.AR_PROMISE) or any(d in text for d in i18n.AR_DAYS):
+        today = core.today()
+        for name, idx in i18n.AR_DAYS.items():
+            if name in text:
+                ahead = (idx - today.weekday()) % 7 or 7
+                return {"intent": "promise", "promised_date": (today + timedelta(days=ahead)).isoformat(),
+                        "summary": "Customer promised to pay (Arabic)."}
+        return {"intent": "promise", "promised_date": (today + timedelta(days=1 if "غد" in text else 7)).isoformat(),
+                "summary": "Customer promised to pay (Arabic)."}
     if any(k in t for k in DISPUTE):
         return {"intent": "dispute", "promised_date": None, "summary": "Customer says the invoice is wrong."}
     if any(k in t for k in PAID):

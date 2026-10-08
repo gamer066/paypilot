@@ -142,6 +142,13 @@ def extract_invoice(text):
 
 def parse_upload(name, raw):
     """Turn an uploaded file into a list of (invoice dict, method) pairs."""
+    if name.lower().endswith(".pdf"):
+        import pdfplumber
+        with pdfplumber.open(io.BytesIO(raw)) as pdf:
+            text = "\n".join((pg.extract_text() or "") for pg in pdf.pages)
+        if not text.strip():
+            raise ValueError("this PDF has no readable text (it may be a scan)")
+        return [extract_invoice(text)]
     text = raw.decode("utf-8", errors="ignore")
     if name.lower().endswith(".json"):
         data = json.loads(text)
@@ -155,6 +162,59 @@ def parse_upload(name, raw):
             out.append((r, "csv"))
         return out
     return [extract_invoice(text)]
+
+
+# ---------------------------------------------------------------- risk + forecast
+# Simple, explainable estimates (not machine learning): chance an invoice is paid within 30 days.
+PAY_CHANCE = {"Pending": 0.90, "Promised": 0.85, "Overdue": 0.55, "Needs review": 0.30, "Disputed": 0.15}
+
+
+def risk(inv):
+    """Returns (score 0-100, label, why). Higher = more likely to be paid late or never."""
+    if inv["status"] == "Paid":
+        return 0, "Paid", ""
+    score, why = 0, []
+    if inv["days_overdue"]:
+        score += min(55, inv["days_overdue"])
+        why.append(f"{inv['days_overdue']} days late")
+    if inv["reminders_sent"]:
+        score += 10 * inv["reminders_sent"]
+        why.append(f"{inv['reminders_sent']} reminder(s) sent")
+    if inv["status"] == "Disputed":
+        score += 35
+        why.append("disputed")
+    if inv["status"] == "Needs review":
+        score += 20
+        why.append("invoice has errors")
+    if inv["total"] >= 10000:
+        score += 10
+        why.append("large amount")
+    if inv["status"] == "Promised":
+        score = max(score - 20, 5)
+        why.append("customer promised")
+    score = min(score, 100)
+    label = "High" if score >= 60 else "Medium" if score >= 30 else "Low"
+    return score, label, ", ".join(why) or "on time"
+
+
+def forecast():
+    """Expected cash in the next 30 days, by week. Returns (rows, total)."""
+    weeks = {"This week": 0.0, "Week 2": 0.0, "Week 3": 0.0, "Week 4": 0.0}
+    for inv in all_invoices():
+        if inv["status"] == "Paid":
+            continue
+        amount = inv["total"] * PAY_CHANCE.get(inv["status"], 0.5)
+        if inv["status"] == "Promised":
+            d = (_d(inv["promised_date"]) - today()).days
+        elif inv["status"] == "Overdue":
+            d = 10  # overdue invoices: assume it takes about 10 days after we chase
+        else:
+            d = inv["days_to_due"] + 5  # customers usually pay a few days after the due date
+        d = max(d, 0)
+        key = "This week" if d <= 7 else "Week 2" if d <= 14 else "Week 3" if d <= 21 else "Week 4" if d <= 30 else None
+        if key:
+            weeks[key] += amount
+    return weeks, sum(weeks.values())
 
 
 # ---------------------------------------------------------------- report
@@ -185,6 +245,8 @@ def build_report():
         "awaiting_approval": db.query("SELECT COUNT(*) n FROM drafts WHERE status='pending_approval'")[0]["n"],
         "open_escalations": db.query("SELECT COUNT(*) n FROM escalations WHERE status='open'")[0]["n"],
         "buckets": buckets,
+        "forecast": forecast()[0],
+        "forecast_total": forecast()[1],
         "top_overdue": sorted(overdue, key=lambda i: -i["total"])[:5],
     }
 
@@ -202,6 +264,8 @@ def report_markdown(r):
              f"- **Invoices with errors (cannot chase yet):** {', '.join(r['needs_review']) or 'none'}",
              "", "## Money by age"]
     lines += [f"- {k}: AED {v:,.2f}" for k, v in r["buckets"].items()]
+    lines += ["", f"## Expected cash, next 30 days (estimate): AED {r['forecast_total']:,.2f}"]
+    lines += [f"- {k}: AED {v:,.2f}" for k, v in r["forecast"].items()]
     lines += ["", "## Biggest overdue invoices"]
     lines += [f"- {i['id']} {i['customer']}: AED {i['total']:,.2f}, {i['days_overdue']} days late"
               for i in r["top_overdue"]] or ["- none"]

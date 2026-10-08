@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS invoices (
     amount_excl_vat REAL, vat REAL, total REAL,
     issue_date TEXT, due_date TEXT,
     state TEXT DEFAULT 'open',          -- open / paid / disputed
-    promised_date TEXT, source TEXT, created TEXT);
+    promised_date TEXT, source TEXT, created TEXT, language TEXT DEFAULT 'en');
 CREATE TABLE IF NOT EXISTS drafts (
     id INTEGER PRIMARY KEY AUTOINCREMENT, invoice_id TEXT, tone TEXT,
     subject TEXT, body TEXT,
@@ -44,6 +44,10 @@ def _conn():
 def init():
     c = _conn()
     c.executescript(SCHEMA)
+    try:  # older database files do not have the language column yet
+        c.execute("ALTER TABLE invoices ADD COLUMN language TEXT DEFAULT 'en'")
+    except sqlite3.OperationalError:
+        pass
     c.commit()
     c.close()
 
@@ -73,16 +77,17 @@ def log(actor, action, invoice_id="", detail=""):
 
 
 def upsert_invoice(inv, source="upload"):
-    old = query("SELECT state, promised_date FROM invoices WHERE id=?", (inv["id"],))
+    old = query("SELECT state, promised_date, language FROM invoices WHERE id=?", (inv["id"],))
     state = old[0]["state"] if old else "open"
     promised = old[0]["promised_date"] if old else None
+    lang = inv.get("language") or (old[0]["language"] if old else "en") or "en"
     run("""INSERT OR REPLACE INTO invoices
            (id, customer, email, trn, amount_excl_vat, vat, total, issue_date,
-            due_date, state, promised_date, source, created)
-           VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)""",
+            due_date, state, promised_date, source, created, language)
+           VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
         (inv["id"], inv.get("customer", ""), inv.get("email", ""), inv.get("trn", ""),
          inv.get("amount_excl_vat") or 0, inv.get("vat") or 0, inv.get("total") or 0,
-         inv.get("issue_date", ""), inv.get("due_date", ""), state, promised, source, now()))
+         inv.get("issue_date", ""), inv.get("due_date", ""), state, promised, source, now(), lang))
 
 
 def reset():
