@@ -4,3 +4,7 @@ __pycache__/
 *.pyc
 demo_backup.mp4
 site/
+docs_upload.zip
+_video_tmp/
+demo_backup.mp4
+_video_log.txt

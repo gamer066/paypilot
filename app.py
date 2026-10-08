@@ -68,7 +68,8 @@ if not invoices:
 pending_n = db.query("SELECT COUNT(*) n FROM drafts WHERE status='pending_approval'")[0]["n"]
 esc_n = db.query("SELECT COUNT(*) n FROM escalations WHERE status='open'")[0]["n"]
 
-tabs = st.tabs(["1 📄 Invoices", "2 🤖 Run agent", f"3 ✅ Approvals ({pending_n + esc_n})",
+# Tab labels must stay constant: Streamlit jumps back to tab 1 if a label changes after a click.
+tabs = st.tabs(["1 📄 Invoices", "2 🤖 Run agent", "3 ✅ Approvals",
                 "4 💬 Customer replies", "5 📊 Weekly report", "6 📜 Audit log"])
 
 # ------------------------------------------------------------------ 1 invoices
@@ -165,6 +166,7 @@ with tabs[1]:
 with tabs[2]:
     st.subheader("Reminders waiting for your approval")
     drafts = db.query("SELECT * FROM drafts WHERE status='pending_approval' ORDER BY id")
+    st.caption(f"{len(drafts)} reminder(s) waiting · {esc_n} item(s) need a human")
     if not drafts:
         st.info("Nothing waiting. Run the agent in tab 2.")
     for d in drafts:
