@@ -65,6 +65,13 @@ slide("Built for what matters to Red Rock", [
     "Communications + escalation  ->  reply handling, humans for the hard cases",
     "Automated reports  ->  weekly cash summary",
     "Human approval + audit log  ->  built in"])
+slide("Business model", [
+    "Who: small UAE businesses that invoice on credit (trading, catering, services)",
+    "Price (proposed): AED 99 per month per business",
+    "One recovered AED 3,000 invoice pays for the whole year",
+    "Low cost to run: the agent only drafts, the owner approves in seconds",
+    "Later: pay-per-recovery option and accountant partnerships"],
+      sub="Simple, affordable, easy to try")
 slide("Next steps", [
     "Real email sending (Gmail / Outlook) after approval",
     "Connect to accounting software (e.g. Zoho, QuickBooks)",

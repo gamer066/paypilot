@@ -26,6 +26,7 @@ try:
         pg.get_by_role("button", name=re.compile("One-click demo")).click()
         time.sleep(6)
         shot = lambda n: pg.screenshot(path=f"docs/img/{n}.jpg", type="jpeg", quality=82)
+        pg.mouse.move(900, 400); pg.mouse.wheel(0, 640); time.sleep(1)
         shot("invoices")
         pg.get_by_role("tab").nth(2).click(); time.sleep(2)
         pg.mouse.wheel(0, 120); time.sleep(1)

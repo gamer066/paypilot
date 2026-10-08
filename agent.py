@@ -15,6 +15,9 @@ Steps: call list_attention. For each invoice, follow its suggested action:
 - draft_* actions: call check_invoice, then draft_reminder (tone matches the action; write a courteous,
   professional email), then request_approval with the draft id.
 - escalate_errors / escalate_no_reply: call escalate_to_human with a clear reason (list the exact errors).
+Before you act on each invoice, call log_action with action="reasoning", the invoice_id, and in detail one or
+two plain sentences explaining WHY you chose that tone or that escalation (days late, reminders already sent,
+errors found, customer language). Write drafts in the invoice's language field (en or ar).
 Rules you must follow: never try to send an email yourself before a human approves (send_email is blocked
 until then). Never invent amounts or dates. Never threaten the customer. When finished, reply with a
 2-3 line summary of what you did."""
@@ -33,10 +36,30 @@ def run_agent(max_steps=40):
     return "rules", _run_rules()
 
 
+def _why(item):
+    """Plain-English reason for what the agent decided about one invoice (offline mode)."""
+    iid, a, n = item["invoice_id"], item["action"], item["reminders_sent"]
+    lang = " The customer prefers Arabic, so I'll write it in Arabic." if item.get("language") == "ar" else ""
+    if a == "escalate_errors":
+        return (f"{iid} has errors ({'; '.join(item['issues'])}). Chasing a wrong invoice would look careless and "
+                "start a dispute, so I am NOT chasing it. I'm sending it to a human to fix first.")
+    if a == "escalate_no_reply":
+        return f"{iid} has had {n} reminders and still no payment. More emails won't help, so a human should call."
+    if a == "draft_heads-up":
+        return f"{iid} is due in {item['days_to_due']} days. A friendly heads-up now makes late payment less likely." + lang
+    tone = {"draft_polite": "polite", "draft_firm": "firm", "draft_final": "final-notice"}[a]
+    why_tone = {"polite": "no reminder has been sent yet, so I start polite",
+                "firm": f"{n} reminder(s) were sent without payment, so I step up to a firm tone",
+                "final-notice": f"{n} reminders were sent without payment, so this is the final notice"}[tone]
+    return (f"{iid} is {item['days_overdue']} days overdue and {why_tone}. "
+            "I'll draft it and send it to the manager. I won't send anything myself." + lang)
+
+
 def _run_rules():
     lines = []
     for item in tools.list_attention()["invoices"]:
         iid, action = item["invoice_id"], item["action"]
+        db.log("agent (rules)", "reasoning", iid, _why(item))
         if action == "escalate_errors":
             reason = "Invoice has errors, cannot chase: " + "; ".join(item["issues"])
             tools.escalate_to_human(iid, reason)

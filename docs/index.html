@@ -139,6 +139,16 @@ tr.new{animation:slidein .5s both}
 .toast{position:fixed;bottom:26px;left:50%;transform:translate(-50%,40px);opacity:0;background:#0d1b36;border:1px solid var(--teal);padding:12px 22px;border-radius:14px;z-index:90;transition:.4s;font-size:14.5px;max-width:92vw;box-shadow:0 0 40px rgba(25,230,201,.25)}
 .toast.show{opacity:1;transform:translate(-50%,0)}
 .toast.bad{border-color:var(--red);box-shadow:0 0 40px rgba(255,84,112,.3)}
+/* gallery */
+.feat{display:flex;gap:10px;flex-wrap:wrap;margin-top:26px}
+.shots{display:grid;grid-template-columns:1fr 1fr;gap:26px;margin-top:40px}
+.shots figure{border:1px solid var(--line);border-radius:18px;overflow:hidden;background:#071022;transition:.4s;box-shadow:0 30px 70px rgba(0,0,0,.4)}
+.shots figure:hover{transform:translateY(-8px) scale(1.01);border-color:rgba(25,230,201,.6);box-shadow:0 30px 80px rgba(25,230,201,.15)}
+.shots .bar{display:flex;gap:6px;padding:10px 14px;background:rgba(255,255,255,.05)}
+.shots .bar i{width:10px;height:10px;border-radius:50%;background:#2b3a5c;display:block}
+.shots img{width:100%;display:block}
+.shots figcaption{padding:12px 16px;color:var(--mut);font-size:14px}
+@media(max-width:900px){.shots{grid-template-columns:1fr}}
 /* safety */
 .two{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:center;margin-top:40px}
 @media(max-width:900px){.two{grid-template-columns:1fr}}
@@ -172,7 +182,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap}
 <div id="bar"></div>
 <nav id="nav"><div class="wrap">
   <a href="#top" class="logo"><i></i>PayPilot</a>
-  <div class="links"><a href="#problem">Problem</a><a href="#story">How it works</a><a href="#demo">Live demo</a><a href="#safety">Safety</a><a href="#fit">Why it wins</a></div>
+  <div class="links"><a href="#problem">Problem</a><a href="#story">How it works</a><a href="#demo">Live demo</a><a href="#app">Real app</a><a href="#safety">Safety</a><a href="#fit">Why it wins</a></div>
   <a class="btn p app-link" href="#" target="_blank" rel="noopener">Open live app &rarr;</a>
 </div></nav>
 
@@ -292,6 +302,25 @@ footer .wrap{display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap}
   </div>
 </div></section>
 
+<section id="app"><div class="wrap">
+  <div class="eyebrow rv">The real app</div>
+  <h2 class="rv">Not a mock-up. <span class="grad">A working agent.</span></h2>
+  <p class="lead rv">Screenshots from the live PayPilot app (fake data). PDF invoices, Arabic and English reminders, risk scores and a 30-day cash forecast.</p>
+  <div class="feat rv">
+    <span class="chip c-tea">PDF invoice reading</span><span class="chip c-vio">Arabic + English</span>
+    <span class="chip c-amb">Risk score per invoice</span><span class="chip c-grn">30-day cash forecast</span>
+    <span class="chip c-red">Human approval gate</span><span class="chip c-gry">Full audit log</span>
+  </div>
+  <div class="shots">
+    <figure class="rv"><div class="bar"><i></i><i></i><i></i></div><img loading="lazy" src="img/invoices.jpg" alt="PayPilot invoices table with status, risk and language"><figcaption>Every invoice: status, risk, language, problems</figcaption></figure>
+    <figure class="rv d1"><div class="bar"><i></i><i></i><i></i></div><img loading="lazy" src="img/approvals.jpg" alt="Approval queue with editable reminder"><figcaption>Approval queue: edit, switch to Arabic, approve</figcaption></figure>
+    <figure class="rv"><div class="bar"><i></i><i></i><i></i></div><img loading="lazy" src="img/report.jpg" alt="Weekly cash summary and forecast"><figcaption>Weekly cash summary and 30-day forecast</figcaption></figure>
+    <figure class="rv d1"><div class="bar"><i></i><i></i><i></i></div><img loading="lazy" src="img/audit.jpg" alt="Audit log"><figcaption>Audit log: every action, who, when</figcaption></figure>
+  </div>
+  <div style="text-align:center;margin-top:40px"><a class="btn p app-link" href="#" target="_blank" rel="noopener">Try it yourself &rarr;</a>
+  <p class="note" style="margin-top:12px">Tip: press the one-click demo button in the sidebar.</p></div>
+</div></section>
+
 <section id="safety"><div class="wrap">
   <div class="eyebrow rv">Safety by design</div>
   <h2 class="rv">The rule is in the <span class="grad">code,</span> not the prompt.</h2>
@@ -336,6 +365,16 @@ footer .wrap{display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap}
     <div class="tile rv"><small>COMMUNICATION</small><h3>Reads replies</h3><p>Promise, dispute or paid claim &mdash; handled or escalated.</p></div>
     <div class="tile rv d1"><small>REPORTS</small><h3>Weekly cash summary</h3><p>Plain-English owner update, plus downloadable report.</p></div>
     <div class="tile rv d2"><small>TRUST</small><h3>Approval + audit log</h3><p>Human sign-off before money messages. Full trail of actions.</p></div>
+  </div>
+</div></section>
+
+<section id="model"><div class="wrap">
+  <div class="eyebrow rv">Business model</div>
+  <h2 class="rv">Simple. Affordable. <span class="grad">Pays for itself.</span></h2>
+  <div class="tiles">
+    <div class="tile rv"><small>WHO</small><h3>Small UAE businesses</h3><p>Trading, catering, cleaning, services &mdash; anyone who invoices on credit and chases payments by hand.</p></div>
+    <div class="tile rv d1"><small>PRICE (PROPOSED)</small><h3>AED 99 / month</h3><p>One flat price per business. Agent, approvals, reports and audit log included.</p></div>
+    <div class="tile rv d2"><small>VALUE</small><h3>One invoice pays the year</h3><p>Recover a single AED 3,000 invoice and a full year of PayPilot (AED 1,188) is covered.</p></div>
   </div>
 </div></section>
 

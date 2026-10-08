@@ -166,13 +166,23 @@ with tabs[1]:
              "(polite first, firmer later) and sends them **to the approval queue - not to customers**. "
              "Invoices with errors or no reply after 3 reminders go to a human.")
     if st.button("▶ Run agent now", type="primary"):
+        start_id = (db.query("SELECT COALESCE(MAX(id),0) m FROM audit")[0]["m"])
         with st.spinner("Agent working..."):
             mode, lines = agent.run_agent()
-        st.session_state["agent_out"] = (mode, lines)
+        st.session_state["agent_out"] = (mode, lines, start_id)
         st.rerun()
     if "agent_out" in st.session_state:
-        mode, lines = st.session_state["agent_out"]
+        mode, lines, start_id = st.session_state["agent_out"]
         st.success(f"Agent finished (mode: {mode}). Now open tab 3 to approve.")
+        why = db.query("SELECT invoice_id, detail, actor FROM audit WHERE action='reasoning' AND id>? ORDER BY id",
+                       (start_id,))
+        if why:
+            with st.container(border=True):
+                st.markdown("**🧠 Agent reasoning**  " + (
+                    "· written by Claude" if mode.startswith("Claude") else "· rule-based explanation (no API key)"))
+                for w in why:
+                    st.markdown(f"- {w['detail']}")
+        st.markdown("**What it did**")
         for ln in lines:
             st.write("• " + ln)
 
@@ -189,6 +199,10 @@ with tabs[2]:
             is_ar = inv.get("language") == "ar"
             st.markdown(f"**{d['invoice_id']}** · {inv['customer']} · AED {inv['total']:,.2f} · "
                         f"tone: `{d['tone']}` · language: `{'Arabic' if is_ar else 'English'}` · to: {inv['email']}")
+            why = db.query("SELECT detail FROM audit WHERE action='reasoning' AND invoice_id=? ORDER BY id DESC LIMIT 1",
+                           (d["invoice_id"],))
+            if why:
+                st.caption("🧠 Why: " + why[0]["detail"])
             st.text_input("Subject", d["subject"], key=f"sub{d['id']}", disabled=True)
             body = st.text_area("Email (you can edit before approving)", d["body"], key=f"body{d['id']}", height=190)
             a, b, c3 = st.columns([1, 1, 2])
@@ -267,10 +281,10 @@ with tabs[4]:
     left, right = st.columns(2)
     with left:
         st.markdown("**Unpaid money by age (AED)**")
-        st.bar_chart(pd.Series(r["buckets"]))
+        st.bar_chart(pd.Series(r["buckets"]), color="#19e6c9")
     with right:
         st.markdown(f"**Expected cash, next 30 days: AED {r['forecast_total']:,.0f}**")
-        st.bar_chart(pd.Series(r["forecast"]))
+        st.bar_chart(pd.Series(r["forecast"]), color="#8b5cf6")
         st.caption("Estimate: paid-chance is 90% pending, 85% promised, 55% overdue, 30% with errors, 15% disputed.")
     st.download_button("⬇ Download report (Markdown)", core.report_markdown(r), "paypilot_weekly_report.md")
 
